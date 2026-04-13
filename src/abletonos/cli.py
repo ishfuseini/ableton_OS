@@ -2,6 +2,8 @@
 
 import typer
 
+from abletonos.logging_config import setup_logging
+
 app = typer.Typer(
     name="abletonos",
     help="Ableton project organizer and sample library manager for macOS.",
@@ -9,9 +11,9 @@ app = typer.Typer(
 
 
 @app.callback()
-def callback():
+def callback(debug: bool = typer.Option(False, "--debug", help="Enable debug logging")):
     """AbletonOS - Keep your Ableton projects portable and sample library searchable."""
-    pass
+    setup_logging(debug=debug)
 
 
 @app.command()
