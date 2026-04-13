@@ -12,6 +12,12 @@ build/
 dist/
 *.egg-info/
 .eggs/
+.ruff_cache/
+.black cache/
+.boстребования/
+
+# uv
+.uv/
 
 # Virtual environments
 venv/
