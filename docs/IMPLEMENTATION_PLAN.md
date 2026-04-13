@@ -4,22 +4,23 @@ Based on: `ONE_PAGER.md`, `DEV_SPEC.md`, `SPEC.md`
 
 ---
 
-## Phase 0 — Project Scaffold
+## Phase 0 — Project Scaffold ✅
 
 **Duration:** 1–2 days
 **Goal:** Ready-to-run CLI skeleton with packaging and logging.
+**Status:** COMPLETED — Merged via PR #1
 
 ### Tasks
 
-- [ ] Initialize Python project with `pyproject.toml` (package name: `abletonos`)
-- [ ] Set up Typer CLI entrypoint (`abletonos` command)
-- [ ] Define XDG-style path constants:
+- [x] Initialize Python project with `pyproject.toml` (package name: `abletonos`)
+- [x] Set up Typer CLI entrypoint (`abletonos` command)
+- [x] Define XDG-style path constants:
   - Config: `~/.abletonOS/config/`
   - Data: `~/.abletonOS/db/`
   - Logs: `~/.abletonOS/logs/`
   - Templates: `~/.abletonOS/templates/`
-- [ ] Configure Python `logging` module (INFO default, DEBUG via `--debug` flag)
-- [ ] Add dependencies to `pyproject.toml`:
+- [x] Configure Python `logging` module (INFO default, DEBUG via `--debug` flag)
+- [x] Add dependencies to `pyproject.toml`:
   - `typer >= 0.6`
   - `rich` (for interactive UI)
   - `portalocker >= 2.7`
@@ -27,13 +28,13 @@ Based on: `ONE_PAGER.md`, `DEV_SPEC.md`, `SPEC.md`
   - `pydantic >= 1.10`
   - `pytest`
   - `packaging.version`
-- [ ] Create stub `__main__.py` and CLI group structure
-- [ ] Initialize git repo (if not already)
+- [x] Create stub `__main__.py` and CLI group structure
+- [x] Initialize git repo (if not already)
 
 ### Exit Criteria
 
-- `python -m abletonos --help` prints CLI help
-- Config dir structure created on first run
+- [x] `python -m abletonos --help` prints CLI help
+- [x] Config dir structure created on first run
 
 ---
 
