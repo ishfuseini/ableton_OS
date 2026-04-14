@@ -82,14 +82,12 @@ def manifest_lock(
         elapsed = time.monotonic() - start
         remaining = timeout - elapsed
         if remaining <= 0:
-            raise TimeoutError(
-                f"Could not acquire lock {lock_path} in {timeout}s"
-            )
+            raise TimeoutError(f"Could not acquire lock {lock_path} in {timeout}s")
         try:
             lock = portalocker.Lock(lock_path, timeout=min(1.0, remaining))
             lock.acquire()
             break
-        except portalocker.LockException as err:
+        except portalocker.LockException:
             time.sleep(backoff)
             backoff = min(backoff * 2, max_backoff)
 

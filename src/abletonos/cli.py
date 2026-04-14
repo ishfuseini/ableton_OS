@@ -49,7 +49,10 @@ def init_config(
         help="Sample library root path (e.g., ~/Music/Samples)",
     ),
     pocketbase_url: str | None = typer.Option(
-        None, "--pocketbase-url", "-u", help="PocketBase API URL (e.g., http://192.168.1.100:8090)"
+        None,
+        "--pocketbase-url",
+        "-u",
+        help="PocketBase API URL (e.g., http://192.168.1.100:8090)",
     ),
 ) -> None:
     """Initialize configuration for AbletonOS.
@@ -62,7 +65,9 @@ def init_config(
     console.print("\n[bold blue]AbletonOS Configuration Wizard[/bold blue]\n")
 
     ensure_directories()
-    console.print("[green]Created directory structure: ~/.abletonOS/{config,db,logs,templates}/[/green]\n")
+    console.print(
+        "[green]Created directory structure: ~/.abletonOS/{config,db,logs,templates}/[/green]\n"
+    )
 
     existing = None
     try:
@@ -70,7 +75,12 @@ def init_config(
     except FileNotFoundError:
         pass
 
-    if existing and project_root is None and library_root is None and pocketbase_url is None:
+    if (
+        existing
+        and project_root is None
+        and library_root is None
+        and pocketbase_url is None
+    ):
         console.print(f"[yellow]Existing configuration found at {CONFIG_FILE}[/yellow]")
         console.print(f"  Project root:   {existing.project_root}")
         console.print(f"  Library root:   {existing.library_root or '(not set)'}")
@@ -130,7 +140,9 @@ def init_config(
     console.print(f"  PocketBase URL: [cyan]{pocketbase_url or '(not set)'}[/cyan]\n")
     console.print("[bold green]Configuration complete![/bold green]")
     console.print("\nNext steps:")
-    console.print("  • Run [cyan]abletonos add-samples <folder>[/cyan] to import a sample pack")
+    console.print(
+        "  • Run [cyan]abletonos add-samples <folder>[/cyan] to import a sample pack"
+    )
 
 
 @app.command()
@@ -262,9 +274,13 @@ def pb():
             console.print("[green]✓[/green] PocketBase is healthy")
             console.print(f"  URL: [cyan]{config.pocketbase_url}[/cyan]")
             if response.json().get("database"):
-                console.print(f"  Database: [green]{response.json()['database']}[/green]")
+                console.print(
+                    f"  Database: [green]{response.json()['database']}[/green]"
+                )
         else:
-            console.print(f"[red]✗[/red] PocketBase returned status {response.status_code}")
+            console.print(
+                f"[red]✗[/red] PocketBase returned status {response.status_code}"
+            )
     except requests.RequestException as e:
         console.print(f"[red]✗[/red] Cannot connect to PocketBase: {e}")
         console.print(f"  URL: [cyan]{config.pocketbase_url}[/cyan]")

@@ -1,4 +1,5 @@
 """Tests for config module."""
+
 from abletonos.config import AbletonOSConfig
 
 

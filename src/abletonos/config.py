@@ -2,12 +2,11 @@
 
 from __future__ import annotations
 
-from dataclasses import dataclass, asdict
+from dataclasses import asdict, dataclass
 from pathlib import Path
 from typing import Any
 
 import yaml
-
 
 # XDG Base Directory paths (Phase 0 spec)
 ABLETONOS_DIR = Path.home() / ".abletonOS"
@@ -55,9 +54,11 @@ def load_config() -> AbletonOSConfig:
         FileNotFoundError: If config file doesn't exist.
     """
     if not CONFIG_FILE.exists():
-        raise FileNotFoundError(f"Config file not found at {CONFIG_FILE}. Run 'abletonos init-config' first.")
+        raise FileNotFoundError(
+            f"Config file not found at {CONFIG_FILE}. Run 'abletonos init-config' first."
+        )
 
-    with open(CONFIG_FILE, "r", encoding="utf-8") as f:
+    with open(CONFIG_FILE, encoding="utf-8") as f:
         data: dict[str, Any] = yaml.safe_load(f) or {}
 
     return AbletonOSConfig(

@@ -3,10 +3,7 @@
 from __future__ import annotations
 
 import json
-import os
-import tempfile
 import threading
-import time
 from datetime import UTC, datetime
 from pathlib import Path
 from uuid import uuid4
@@ -50,7 +47,9 @@ def sample_manifest() -> Manifest:
 class TestAtomicWriteManifest:
     """Tests for atomic_write_manifest function."""
 
-    def test_atomic_write_manifest(self, temp_project: Path, sample_manifest: Manifest) -> None:
+    def test_atomic_write_manifest(
+        self, temp_project: Path, sample_manifest: Manifest
+    ) -> None:
         """Verify temp file is used and renamed correctly."""
         manifest_path = temp_project / "manifest.json"
 
@@ -84,7 +83,6 @@ class TestAtomicWriteManifest:
         assert data["project_name"] == "Updated Project"
         assert data["manifest_version"] == 1
 
-    
 
 class TestLockAcquisition:
     """Tests for lock acquisition functionality."""
@@ -105,7 +103,7 @@ class TestLockAcquisition:
         with manifest_lock(temp_project):
             pass
 
-        with open(lock_path, "rb") as f:
+        with open(lock_path, "rb") as _:
             pass
 
     def test_concurrent_lock_rejected(self, temp_project: Path) -> None:
@@ -174,7 +172,9 @@ class TestConcurrentWriteSerialization:
             with results_lock:
                 results.append(version)
 
-        threads = [threading.Thread(target=write_with_version, args=(i,)) for i in range(5)]
+        threads = [
+            threading.Thread(target=write_with_version, args=(i,)) for i in range(5)
+        ]
 
         for t in threads:
             t.start()
@@ -195,9 +195,7 @@ class TestConcurrentWriteSerialization:
 class TestReadManifest:
     """Tests for read_manifest function."""
 
-    def test_read_manifest_returns_none_if_not_exists(
-        self, temp_project: Path
-    ) -> None:
+    def test_read_manifest_returns_none_if_not_exists(self, temp_project: Path) -> None:
         """Verify read_manifest returns None when file doesn't exist."""
         result = read_manifest(temp_project)
         assert result is None
@@ -246,7 +244,7 @@ class TestWriteManifest:
         self, temp_project: Path, sample_manifest: Manifest
     ) -> None:
         """Verify multiple writes correctly increment version each time."""
-        for expected_version in range(1, 4):
+        for _ in range(1, 4):
             write_manifest(temp_project, sample_manifest)
 
         result = read_manifest(temp_project)

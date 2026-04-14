@@ -222,7 +222,9 @@ def preview(
                 source_path=entry.source_path,
                 pack_name=entry.pack_name,
                 proposed_type=new_type,
-                destination_path=Path(new_type) / entry.pack_name / entry.source_path.name,
+                destination_path=Path(new_type)
+                / entry.pack_name
+                / entry.source_path.name,
             )
         )
 

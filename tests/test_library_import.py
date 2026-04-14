@@ -1,7 +1,8 @@
 """Tests for import_samples."""
+
 from pathlib import Path
 
-from abletonos.library import ImportResult, SampleEntry, import_samples
+from abletonos.library import SampleEntry, import_samples
 
 
 def _make_entry(source_path: Path, pack_name: str, proposed_type: str) -> SampleEntry:

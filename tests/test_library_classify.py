@@ -1,4 +1,5 @@
 """Tests for sample classification logic."""
+
 import pytest
 
 from abletonos.library import KEYWORD_MAP, VALID_TYPES, classify_sample
@@ -60,4 +61,6 @@ def test_classify_fallback_to_other(tmp_path):
 def test_all_type_keywords_map():
     """Every value in KEYWORD_MAP must be a valid type."""
     for keyword, type_name in KEYWORD_MAP.items():
-        assert type_name in VALID_TYPES, f"Keyword '{keyword}' maps to unknown type '{type_name}'"
+        assert (
+            type_name in VALID_TYPES
+        ), f"Keyword '{keyword}' maps to unknown type '{type_name}'"

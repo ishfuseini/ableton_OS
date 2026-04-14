@@ -1,4 +1,5 @@
 """Tests for analyze_folder."""
+
 from pathlib import Path
 
 from abletonos.library import analyze_folder
@@ -18,8 +19,8 @@ def test_analyze_finds_audio_files(tmp_path):
     _make_file(pack / "snare.aiff")
     _make_file(pack / "loop.mp3")
     _make_file(pack / "pad.flac")
-    _make_file(pack / "readme.txt")   # should be skipped
-    _make_file(pack / "cover.png")    # should be skipped
+    _make_file(pack / "readme.txt")  # should be skipped
+    _make_file(pack / "cover.png")  # should be skipped
 
     entries = analyze_folder(pack)
     filenames = {e.source_path.name for e in entries}
