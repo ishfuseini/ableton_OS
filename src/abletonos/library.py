@@ -158,3 +158,72 @@ def import_samples(entries: list[SampleEntry], library_root: Path) -> ImportResu
             result.errors.append((entry.source_path, str(exc)))
 
     return result
+
+
+def preview(
+    entries: list[SampleEntry],
+    library_root: Path,
+    *,
+    console: object | None = None,
+) -> list[SampleEntry]:
+    """Render a Rich preview table and allow per-entry type overrides.
+
+    Prints a summary of proposed classifications. If the user opts to
+    override, loops through entries and prompts for a new type for each.
+
+    Args:
+        entries: List of SampleEntry objects from analyze_folder.
+        library_root: Used to display full destination paths.
+        console: Rich Console instance (creates one if not provided).
+
+    Returns:
+        The (possibly modified) list of SampleEntry objects.
+    """
+    from collections import Counter
+
+    from rich.console import Console as RichConsole
+    from rich.prompt import Confirm, Prompt
+    from rich.table import Table
+
+    con: RichConsole = console or RichConsole()  # type: ignore[assignment]
+
+    # Summary by type
+    counts = Counter(e.proposed_type for e in entries)
+    con.print(f"\n[bold]Found {len(entries)} samples[/bold]")
+    for type_name in VALID_TYPES:
+        if counts[type_name]:
+            con.print(f"  {type_name:<10} → {counts[type_name]} files")
+
+    # Full table
+    table = Table(title="Proposed Import", show_lines=False)
+    table.add_column("File", style="cyan", no_wrap=True)
+    table.add_column("Type", style="green")
+    table.add_column("Destination", style="dim")
+    for entry in entries:
+        dest = str(library_root / entry.destination_path)
+        table.add_row(entry.source_path.name, entry.proposed_type, dest)
+    con.print(table)
+
+    if not Confirm.ask("\nOverride any classifications?", default=False, console=con):
+        return entries
+
+    updated: list[SampleEntry] = []
+    type_choices = "/".join(VALID_TYPES)
+    for entry in entries:
+        new_type = Prompt.ask(
+            f"  [cyan]{entry.source_path.name}[/cyan] (current: {entry.proposed_type})\n"
+            f"  Type [{type_choices}]",
+            choices=VALID_TYPES,
+            default=entry.proposed_type,
+            console=con,
+        )
+        updated.append(
+            SampleEntry(
+                source_path=entry.source_path,
+                pack_name=entry.pack_name,
+                proposed_type=new_type,
+                destination_path=Path(new_type) / entry.pack_name / entry.source_path.name,
+            )
+        )
+
+    return updated
