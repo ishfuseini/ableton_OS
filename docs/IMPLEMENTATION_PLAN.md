@@ -102,88 +102,78 @@ PocketBase is **hosted externally** (not embedded in CLI). Users self-host PB an
 
 ---
 
-## Phase 3 — Project Creation & Import
+## Phase 3 — Sample Library Organization ✅
 
-**Duration:** 3–5 days
-**Goal:** `new` wizard creates date-first project folders; `import` standardizes existing projects.
+**Duration:** 3 days
+**Goal:** `add-samples` command organizes downloaded samples into a typed library.
+**Status:** COMPLETED — Merged via PR #4
 
 ### Tasks
 
-#### `new` command
-
-- [ ] Interactive wizard: prompt for project name
-- [ ] Auto-generate date prefix: `YYYY-MM-DD`
-- [ ] Create folder structure:
-  ```
-  <PROJECT_ROOT>/YYYY/MM/YYYY-MM-DD ProjectName/
-    README.md
-    manifest.json
-    Samples/
-  ```
-- [ ] Generate `README.md` from template
-- [ ] Generate `manifest.json` with:
-  - `project_uuid` (UUID v4)
-  - `project_name`
-  - `created_at` / `updated_at`
-  - `generated_by`: `abletonos/<version>`
-  - `resources`: `[]`
-  - `version_history`: `[]`
-- [ ] Open new project in Finder
-
-#### `import` command
-
-- [ ] Accept `--source PATH` to existing project
-- [ ] Analyze source structure: locate `.als` files, existing Samples/
-- [ ] Plan target folder under configured project root
-- [ ] Preview step: show copy/move operations before executing
-- [ ] Default to copy (not move) for safety
-- [ ] Handle name collisions with suffix increment or user prompt
-- [ ] Write `original_path` in manifest for imported projects
-
-#### Pre-op snapshots
-
-- [ ] Before destructive operations, create snapshot artifacts in `<project>/.snapshots/`:
-  - `manifest-<ISO8601>.json`
-  - `<als-name>.<ISO8601>.als`
-- [ ] Implement snapshot retention: prune snapshots older than 30 days
+- [x] Add `library_root` field to `AbletonOSConfig` (config module)
+- [x] Update `init-config` wizard to prompt for `--library-root`
+- [x] Implement `src/abletonos/library.py`:
+  - `classify_sample()` — folder-name keywords → filename keywords → "Other"
+  - `analyze_folder()` — recursively find audio files, classify, build `SampleEntry` list
+  - `preview()` — show grouped table, allow per-type overrides via Rich prompt
+  - `import_samples()` — copy to `<library_root>/Type/<pack-name>/` using `shutil.copy2`
+- [x] Implement `add-samples <folder>` CLI command (analyze → preview → import)
+- [x] Disk space check before copy
+- [x] Unit tests for classify, analyze, import, preview (mock Rich prompts)
 
 ### Exit Criteria
 
-- `abletonos new "My Song"` creates correctly structured folder
-- `abletonos import --source /path/to/existing` previews and executes import
-- Snapshots created before any overwrite/move operation
+- [x] `abletonos add-samples <folder>` copies files to `<library_root>/Type/<pack-name>/`
+- [x] Classification uses folder name first, filename second, "Other" fallback
+- [x] User can override type per category during preview step
+- [x] Skips existing files, reports errors without aborting
+
+### Library Structure
+
+```
+<library_root>/
+  Drums/<pack-name>/*.wav
+  Bass/<pack-name>/*.wav
+  Synth/ | FX/ | Vocals/ | Guitar/ | Other/
+```
 
 ---
 
-## Phase 4 — Sample Import & Provenance
+## Phase 4 — Project Add
 
-**Duration:** 3–5 days
-**Goal:** `add-samples` wizard copies samples with provenance tracking.
+**Duration:** 2–3 days
+**Goal:** `add <source>` registers an existing Ableton project into the managed project root with a manifest.
 
 ### Tasks
 
-- [ ] Implement `add-samples` wizard:
-  - Interactive file/folder picker (macOS native or `tkinter` dialog)
-  - Prompt for pack-slug (validated: `^[a-z0-9-]{1,64}$`)
-- [ ] Copy samples to `Project/Samples/[pack-slug]/` preserving original filenames
-- [ ] Use `shutil.copy2` to preserve mtime
-- [ ] Compute SHA-256 checksum for each copied file
-- [ ] Populate `manifest.resources` with:
-  - `resource_uuid` (UUID v4)
-  - `path`: relative path inside project
-  - `source_filename`: original filename at import
-  - `size_bytes`, `mtime`, `sha256_checksum`
-  - `extraction_status`: `"none"` (default)
-- [ ] Atomic manifest update (lock → read → validate → update → atomic write → unlock)
-- [ ] Sync to PocketBase after manifest write:
-  - `bulk_upsert_resources()` for new samples
-  - Update project doc `resources_snippet` and `manifest_hash`
+- [ ] Implement `add <source>` CLI command:
+  - Accept path to an existing Ableton project folder
+  - Derive project name from source folder name
+  - Auto-generate date prefix: `YYYY-MM-DD`
+  - Copy folder to `<project_root>/YYYY-MM-DD-<ProjectName>/` using `shutil.copytree`
+  - Preserve all file metadata (`shutil.copy2`)
+- [ ] Generate `manifest.json` in the destination project folder:
+  - `project_uuid` (UUID v4)
+  - `project_name` (derived from source folder name)
+  - `created_at` / `updated_at` (ISO 8601)
+  - `generated_by`: `abletonos/<version>`
+  - `original_path`: absolute path of the source folder
+  - `resources`: list of all files found (path, size_bytes, mtime, sha256_checksum)
+  - `version_history`: `[]`
+- [ ] SHA-256 checksum for every file in the project
+- [ ] Disk space check before copy
+- [ ] Handle name collisions: if target folder exists, append `-2`, `-3`, etc.
+- [ ] Unit tests:
+  - `test_add_creates_dated_folder` — correct `YYYY-MM-DD-Name` structure
+  - `test_add_generates_manifest` — manifest fields populated correctly
+  - `test_add_collision_handling` — suffix increment on collision
+  - `test_add_disk_space_check` — abort when insufficient space
 
 ### Exit Criteria
 
-- `abletonos add-samples` copies files to correct `Samples/[pack-slug]/` path
-- Manifest resources contain correct provenance (checksum, source, size, mtime)
-- PB reflects new resources on next `index` run
+- `abletonos add /path/to/MyProject` copies to `<project_root>/YYYY-MM-DD-MyProject/`
+- `manifest.json` generated with all files checksummed
+- Name collisions handled gracefully
 
 ---
 
@@ -330,8 +320,8 @@ PocketBase is **hosted externally** (not embedded in CLI). Users self-host PB an
 | 0 | Project Scaffold | 1–2 days | 1–2 days |
 | 1 | Config & PB Bootstrap | 2–4 days | 3–6 days |
 | 2 | Manifest API & Locking | 2–3 days | 5–9 days |
-| 3 | Project Creation & Import | 3–5 days | 8–14 days |
-| 4 | Sample Import & Provenance | 3–5 days | 11–19 days |
+| 3 | Sample Library Organization ✅ | 3 days | 8–11 days |
+| 4 | Project Add | 2–3 days | 10–14 days |
 | 5 | .als Versioning | 2–3 days | 13–22 days |
 | 6 | Archive Export & Search | 2–4 days | 15–26 days |
 | 7 | Audit & Diagnostics | 2 days | 17–28 days |
