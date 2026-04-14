@@ -3,11 +3,8 @@
 from __future__ import annotations
 
 import json
-
 from datetime import UTC, datetime
 from uuid import uuid4
-
-import pytest
 
 from abletonos.manifest import Manifest, Resource, VersionHistoryEntry
 
@@ -177,18 +174,20 @@ class TestManifestRoundTrip:
         """Test deserializing a manifest from JSON."""
         project_uuid = str(uuid4())
         now = datetime.now(UTC).isoformat().replace("+00:00", "Z")
-        json_str = json.dumps({
-            "schema_version": "1.0.0",
-            "project_uuid": project_uuid,
-            "project_name": "Test Project",
-            "created_at": now,
-            "updated_at": now,
-            "generated_by": "abletonos-cli v0.1.0",
-            "cli_version": "0.1.0",
-            "manifest_version": 1,
-            "resources": [],
-            "version_history": [],
-        })
+        json_str = json.dumps(
+            {
+                "schema_version": "1.0.0",
+                "project_uuid": project_uuid,
+                "project_name": "Test Project",
+                "created_at": now,
+                "updated_at": now,
+                "generated_by": "abletonos-cli v0.1.0",
+                "cli_version": "0.1.0",
+                "manifest_version": 1,
+                "resources": [],
+                "version_history": [],
+            }
+        )
         manifest = Manifest.model_validate_json(json_str)
         assert manifest.schema_version == "1.0.0"
         assert manifest.project_name == "Test Project"
