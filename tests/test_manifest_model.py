@@ -4,7 +4,7 @@ from __future__ import annotations
 
 import json
 
-from datetime import datetime
+from datetime import UTC, datetime
 from uuid import uuid4
 
 import pytest
@@ -17,7 +17,7 @@ class TestResource:
 
     def test_create_resource(self) -> None:
         """Test creating a resource with required fields."""
-        now = datetime.utcnow()
+        now = datetime.now(UTC)
         resource = Resource(
             resource_uuid=uuid4(),
             path="Samples/my-pack/kick.wav",
@@ -32,7 +32,7 @@ class TestResource:
 
     def test_resource_uuid_auto_generated(self) -> None:
         """Test that resource_uuid is auto-generated if not provided."""
-        now = datetime.utcnow()
+        now = datetime.now(UTC)
         resource = Resource(
             path="Samples/test.wav",
             source_filename="test.wav",
@@ -48,7 +48,7 @@ class TestVersionHistoryEntry:
 
     def test_create_entry(self) -> None:
         """Test creating a version history entry."""
-        now = datetime.utcnow()
+        now = datetime.now(UTC)
         entry = VersionHistoryEntry(
             als_filename="My Song_v1.als",
             version_number=1,
@@ -64,7 +64,7 @@ class TestManifest:
 
     def test_create_manifest(self) -> None:
         """Test creating a manifest with required fields."""
-        now = datetime.utcnow()
+        now = datetime.now(UTC)
         manifest = Manifest(
             schema_version="1.0.0",
             project_uuid=uuid4(),
@@ -80,7 +80,7 @@ class TestManifest:
 
     def test_next_manifest_version(self) -> None:
         """Test incrementing manifest version."""
-        now = datetime.utcnow()
+        now = datetime.now(UTC)
         manifest = Manifest(
             schema_version="1.0.0",
             project_uuid=uuid4(),
@@ -95,7 +95,7 @@ class TestManifest:
 
     def test_update_timestamp(self) -> None:
         """Test updating the timestamp."""
-        now = datetime.utcnow()
+        now = datetime.now(UTC)
         manifest = Manifest(
             schema_version="1.0.0",
             project_uuid=uuid4(),
@@ -111,7 +111,7 @@ class TestManifest:
 
     def test_add_resource(self) -> None:
         """Test adding a resource to the manifest."""
-        now = datetime.utcnow()
+        now = datetime.now(UTC)
         manifest = Manifest(
             schema_version="1.0.0",
             project_uuid=uuid4(),
@@ -133,7 +133,7 @@ class TestManifest:
 
     def test_add_version_history(self) -> None:
         """Test adding a version history entry."""
-        now = datetime.utcnow()
+        now = datetime.now(UTC)
         manifest = Manifest(
             schema_version="1.0.0",
             project_uuid=uuid4(),
@@ -158,7 +158,7 @@ class TestManifestRoundTrip:
 
     def test_manifest_to_json(self) -> None:
         """Test serializing a manifest to JSON."""
-        now = datetime.utcnow()
+        now = datetime.now(UTC)
         manifest = Manifest(
             schema_version="1.0.0",
             project_uuid=uuid4(),
@@ -176,7 +176,7 @@ class TestManifestRoundTrip:
     def test_manifest_from_json(self) -> None:
         """Test deserializing a manifest from JSON."""
         project_uuid = str(uuid4())
-        now = datetime.utcnow().isoformat() + "Z"
+        now = datetime.now(UTC).isoformat().replace("+00:00", "Z")
         json_str = json.dumps({
             "schema_version": "1.0.0",
             "project_uuid": project_uuid,
@@ -197,7 +197,7 @@ class TestManifestRoundTrip:
     def test_roundtrip_with_resources(self) -> None:
         """Test round-trip with resources and version history."""
         project_uuid = uuid4()
-        now = datetime.utcnow()
+        now = datetime.now(UTC)
         resource_uuid = uuid4()
 
         manifest = Manifest(

@@ -2,7 +2,7 @@
 
 from __future__ import annotations
 
-from datetime import datetime
+from datetime import UTC, datetime
 from uuid import UUID, uuid4
 
 from pydantic import BaseModel, Field
@@ -65,4 +65,4 @@ class Manifest(BaseModel):
 
     def update_timestamp(self) -> None:
         """Update the updated_at timestamp to now."""
-        self.updated_at = datetime.utcnow()
+        self.updated_at = datetime.now(UTC)
