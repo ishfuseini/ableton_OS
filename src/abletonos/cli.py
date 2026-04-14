@@ -268,12 +268,11 @@ def pb():
 
     import requests
 
-    # Construct health URL - handle both base URL and full URL cases
+    # Construct health URL - strip trailing /api if present, then append /api/health
     pb_url = config.pocketbase_url.rstrip("/")
-    if "/api" in pb_url:
-        url = pb_url + "/health"
-    else:
-        url = pb_url + "/api/health"
+    if pb_url.endswith("/api"):
+        pb_url = pb_url[:-4]
+    url = pb_url + "/api/health"
     try:
         response = requests.get(url, timeout=10)
         if response.status_code == 200:
