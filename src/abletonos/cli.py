@@ -7,9 +7,8 @@ from pathlib import Path
 
 import typer
 from rich.console import Console
-from rich.prompt import Prompt, Confirm
+from rich.prompt import Confirm, Prompt
 
-from abletonos.logging_config import setup_logging
 from abletonos.config import (
     CONFIG_FILE,
     AbletonOSConfig,
@@ -17,6 +16,7 @@ from abletonos.config import (
     load_config,
     save_config,
 )
+from abletonos.logging_config import setup_logging
 
 
 def expand_path(path: str) -> str:
@@ -146,9 +146,82 @@ def import_project(source: str):
 
 
 @app.command()
-def add_samples():
-    """Add samples to a project with provenance tracking."""
-    pass
+def add_samples(
+    source: str = typer.Argument(..., help="Path to folder of samples to import"),
+) -> None:
+    """Import a sample pack into the organized library.
+
+    Three-step flow: analyze → preview → import.
+
+    Classifies samples by folder structure and filename keywords into:
+    Drums, Bass, Synth, FX, Vocals, Guitar, or Other.
+    """
+    import shutil as _shutil
+
+    from abletonos.library import analyze_folder, import_samples, preview
+
+    # Load and validate config
+    try:
+        config = load_config()
+    except FileNotFoundError:
+        console.print("[red]Not configured. Run 'abletonos init-config' first.[/red]")
+        raise typer.Exit(1) from None
+
+    if not config.library_root:
+        console.print(
+            "[red]library_root not set. Run 'abletonos init-config' to configure it.[/red]"
+        )
+        raise typer.Exit(1)
+
+    source_path = Path(expand_path(source))
+    library_root = Path(expand_path(config.library_root))
+
+    # Validate source
+    if not source_path.exists():
+        console.print(f"[red]Source folder not found: {source_path}[/red]")
+        raise typer.Exit(1)
+
+    if not source_path.is_dir():
+        console.print(f"[red]Source must be a directory: {source_path}[/red]")
+        raise typer.Exit(1)
+
+    # Step 1: Analyze
+    console.print(f"\n[bold]Analyzing[/bold] [cyan]{source_path.name}[/cyan]...")
+    entries = analyze_folder(source_path)
+
+    if not entries:
+        console.print(f"[yellow]No audio files found in {source_path}[/yellow]")
+        raise typer.Exit(0)
+
+    # Disk space check
+    total_size = sum(e.source_path.stat().st_size for e in entries)
+    library_root.mkdir(parents=True, exist_ok=True)
+    free_space = _shutil.disk_usage(library_root).free
+    if total_size > free_space:
+        total_mb = total_size / 1024 / 1024
+        free_mb = free_space / 1024 / 1024
+        console.print(
+            f"[red]Insufficient disk space. Need {total_mb:.1f} MB, "
+            f"only {free_mb:.1f} MB free.[/red]"
+        )
+        raise typer.Exit(1)
+
+    # Step 2: Preview (with optional override)
+    entries = preview(entries, library_root, console=console)
+
+    # Step 3: Import
+    console.print(f"\n[bold]Importing {len(entries)} samples...[/bold]")
+    result = import_samples(entries, library_root)
+
+    # Summary
+    console.print("\n[bold green]✓ Import complete[/bold green]")
+    console.print(f"  Copied:  {result.copied}")
+    if result.skipped:
+        console.print(f"  [yellow]Skipped: {result.skipped} (already exist)[/yellow]")
+    if result.errors:
+        console.print(f"  [red]Errors:  {len(result.errors)}[/red]")
+        for path, msg in result.errors:
+            console.print(f"    [red]✗[/red] {path.name}: {msg}")
 
 
 @app.command()
@@ -173,7 +246,7 @@ def pb():
         config = load_config()
     except FileNotFoundError:
         console.print("[red]Not configured. Run 'abletonos init-config' first.[/red]\n")
-        raise typer.Exit(1)
+        raise typer.Exit(1) from None
 
     import requests
 
@@ -186,7 +259,7 @@ def pb():
     try:
         response = requests.get(url, timeout=10)
         if response.status_code == 200:
-            console.print(f"[green]✓[/green] PocketBase is healthy")
+            console.print("[green]✓[/green] PocketBase is healthy")
             console.print(f"  URL: [cyan]{config.pocketbase_url}[/cyan]")
             if response.json().get("database"):
                 console.print(f"  Database: [green]{response.json()['database']}[/green]")
@@ -195,7 +268,7 @@ def pb():
     except requests.RequestException as e:
         console.print(f"[red]✗[/red] Cannot connect to PocketBase: {e}")
         console.print(f"  URL: [cyan]{config.pocketbase_url}[/cyan]")
-        raise typer.Exit(1)
+        raise typer.Exit(1) from None
 
 
 @app.command()
