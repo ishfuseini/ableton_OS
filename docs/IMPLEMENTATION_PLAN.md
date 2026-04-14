@@ -41,31 +41,30 @@ Based on: `ONE_PAGER.md`, `DEV_SPEC.md`, `SPEC.md`
 ## Phase 1 — Config & PocketBase Bootstrap
 
 **Duration:** 2–4 days
-**Goal:** `init-config` wizard creates `config.yaml` and auto-downloads PocketBase.
+**Goal:** `init-config` wizard creates `config.yaml` with hosted PocketBase.
+
+**Status:** COMPLETED (Core functionality - hosted PB, not embedded)
 
 ### Tasks
 
-- [ ] Implement `init-config` interactive wizard:
+- [x] Implement `init-config` interactive wizard:
   - Prompt for project root path (e.g., `~/Music/Ableton`)
-  - Prompt for PocketBase admin password (use once, never persist)
+  - Prompt for PocketBase URL (hosted instance)
   - Create default directory structure under `~/.abletonOS/`
-- [ ] Implement `config.yaml` read/write module
-- [ ] Add PocketBase binary downloader:
-  - Fetch latest macOS arm64 release from GitHub
-  - Store in `~/.abletonOS/db/pocketbase/<version>/pocketbase`
-  - Record version in config for reproducibility
-- [ ] Implement `pb` subcommands:
-  - `pb start` — launch PB as persistent child process, write PID file
-  - `pb stop` — read PID and terminate PB
-  - `pb status` — health-check via HTTP or PID check
-- [ ] Implement PB admin creation via REST API on first run
-- [ ] Stream PB logs to `~/.abletonOS/logs/pocketbase.log`
+- [x] Implement `config.yaml` read/write module (atomic writes)
+- [x] Implement `pb` command:
+  - `pb` — health-check via HTTP to hosted PB
+- [x] Update implementation plan to reflect hosted PB approach
 
 ### Exit Criteria
 
-- `abletonos init-config` creates `~/.abletonOS/config/config.yaml`
-- `abletonos pb start` downloads PB (if missing) and starts PB process
-- PB admin UI accessible at `http://127.0.0.1:8090`
+- [x] `abletonos init-config` creates `~/.abletonOS/config/config.yaml`
+- [x] `abletonos pb` confirms connection to hosted PB
+- [x] Config stores: project_root, pocketbase_url
+
+### Note on PocketBase Hosting
+
+PocketBase is **hosted externally** (not embedded in CLI). Users self-host PB and provide the URL during `init-config`. This simplifies the CLI significantly.
 
 ---
 
