@@ -43,7 +43,10 @@ def init_config(
         None, "--project-root", "-p", help="Project root path (e.g., ~/Music/Ableton)"
     ),
     library_root: str | None = typer.Option(
-        None, "--library-root", "-l", help="Sample library root path (e.g., ~/Music/Samples)"
+        None,
+        "--library-root",
+        "-l",
+        help="Sample library root path (e.g., ~/Music/Samples)",
     ),
     pocketbase_url: str | None = typer.Option(
         None, "--pocketbase-url", "-u", help="PocketBase API URL (e.g., http://192.168.1.100:8090)"
