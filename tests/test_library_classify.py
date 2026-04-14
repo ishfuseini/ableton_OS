@@ -1,9 +1,7 @@
 """Tests for sample classification logic."""
-from pathlib import Path
-
 import pytest
 
-from abletonos.library import classify_sample, KEYWORD_MAP, VALID_TYPES
+from abletonos.library import KEYWORD_MAP, VALID_TYPES, classify_sample
 
 
 @pytest.fixture
