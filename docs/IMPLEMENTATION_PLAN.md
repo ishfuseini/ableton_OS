@@ -73,6 +73,7 @@ Based on: `ONE_PAGER.md`, `DEV_SPEC.md`, `SPEC.md`
 
 **Duration:** 2–3 days
 **Goal:** Reliable manifest read/write with schema validation, atomicity, and concurrency safety.
+**Status:** COMPLETED — Merged via PR #3
 
 ### Tasks
 
