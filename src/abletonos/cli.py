@@ -286,6 +286,7 @@ def pb():
             console.print(
                 f"[red]✗[/red] PocketBase returned status {response.status_code}"
             )
+            raise typer.Exit(1)
     except requests.RequestException as e:
         console.print(f"[red]✗[/red] Cannot connect to PocketBase: {e}")
         console.print(f"  URL: [cyan]{config.pocketbase_url}[/cyan]")
