@@ -142,4 +142,5 @@ def write_manifest(project_path: Path, manifest: Manifest) -> None:
         else:
             manifest.manifest_version = manifest.next_manifest_version()
 
+        manifest.update_timestamp()
         atomic_write_manifest(manifest_path, manifest)
