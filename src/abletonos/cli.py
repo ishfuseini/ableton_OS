@@ -259,6 +259,13 @@ def pb():
         console.print("[red]Not configured. Run 'abletonos init-config' first.[/red]\n")
         raise typer.Exit(1) from None
 
+    if not config.pocketbase_url:
+        console.print(
+            "[red]PocketBase URL not configured. "
+            "Run 'abletonos init-config' to set it.[/red]"
+        )
+        raise typer.Exit(1)
+
     import requests
 
     # Construct health URL - handle both base URL and full URL cases
