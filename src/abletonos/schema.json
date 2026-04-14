@@ -1,0 +1,156 @@
+{
+  "$schema": "http://json-schema.org/draft-07/schema#",
+  "title": "Ableton Project Manifest",
+  "type": "object",
+  "required": [
+    "schema_version",
+    "project_uuid",
+    "project_name",
+    "created_at",
+    "updated_at",
+    "generated_by",
+    "resources",
+    "version_history",
+    "cli_version",
+    "manifest_version"
+  ],
+  "properties": {
+    "schema_version": {
+      "type": "string",
+      "pattern": "^\\d+\\.\\d+\\.\\d+$"
+    },
+    "project_uuid": {
+      "type": "string",
+      "format": "uuid"
+    },
+    "project_name": {
+      "type": "string"
+    },
+    "created_at": {
+      "type": "string",
+      "format": "date-time"
+    },
+    "updated_at": {
+      "type": "string",
+      "format": "date-time"
+    },
+    "generated_by": {
+      "type": "string"
+    },
+    "original_path": {
+      "type": "string"
+    },
+    "project_root": {
+      "type": "string"
+    },
+    "tags": {
+      "type": "array",
+      "items": {
+        "type": "string"
+      }
+    },
+    "finder_tags": {
+      "type": "array",
+      "items": {
+        "type": "string"
+      }
+    },
+    "manifest_version": {
+      "type": "integer",
+      "minimum": 0
+    },
+    "resources": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "required": [
+          "resource_uuid",
+          "path",
+          "source_filename",
+          "size_bytes",
+          "mtime",
+          "sha256_checksum"
+        ],
+        "properties": {
+          "resource_uuid": {
+            "type": "string",
+            "format": "uuid"
+          },
+          "path": {
+            "type": "string"
+          },
+          "source_filename": {
+            "type": "string"
+          },
+          "sidecar_present": {
+            "type": "boolean",
+            "default": false
+          },
+          "size_bytes": {
+            "type": "integer",
+            "minimum": 0
+          },
+          "mtime": {
+            "type": "string",
+            "format": "date-time"
+          },
+          "sha256_checksum": {
+            "type": "string",
+            "minLength": 64,
+            "maxLength": 64
+          },
+          "tags": {
+            "type": "array",
+            "items": {
+              "type": "string"
+            }
+          },
+          "finder_tags": {
+            "type": "array",
+            "items": {
+              "type": "string"
+            }
+          },
+          "extraction_status": {
+            "type": "string",
+            "enum": ["none", "queued", "extracted"]
+          },
+          "audio_metadata_summary": {
+            "type": ["object", "null"]
+          }
+        }
+      }
+    },
+    "backups": {
+      "type": "array",
+      "items": {
+        "type": "object"
+      }
+    },
+    "version_history": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "properties": {
+          "als_filename": {
+            "type": "string"
+          },
+          "version_number": {
+            "type": "integer"
+          },
+          "created_at": {
+            "type": "string",
+            "format": "date-time"
+          },
+          "note": {
+            "type": "string"
+          }
+        }
+      }
+    },
+    "cli_version": {
+      "type": "string"
+    }
+  },
+  "additionalProperties": false
+}
