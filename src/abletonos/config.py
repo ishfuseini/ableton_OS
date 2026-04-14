@@ -2,8 +2,7 @@
 
 from __future__ import annotations
 
-from dataclasses import dataclass, asdict, field
-from datetime import datetime
+from dataclasses import dataclass, asdict
 from pathlib import Path
 from typing import Any
 
@@ -26,12 +25,14 @@ class AbletonOSConfig:
 
     project_root: str
     pocketbase_url: str | None = None
+    library_root: str | None = None
 
     def to_dict(self) -> dict[str, Any]:
         """Convert to dictionary for YAML serialization."""
         return {
             "project_root": self.project_root,
             "pocketbase_url": self.pocketbase_url,
+            "library_root": self.library_root,
         }
 
     @classmethod
@@ -40,6 +41,7 @@ class AbletonOSConfig:
         return cls(
             project_root=data["project_root"],
             pocketbase_url=data.get("pocketbase_url"),
+            library_root=data.get("library_root"),
         )
 
 
@@ -61,6 +63,7 @@ def load_config() -> AbletonOSConfig:
     return AbletonOSConfig(
         project_root=data.get("project_root", ""),
         pocketbase_url=data.get("pocketbase_url"),
+        library_root=data.get("library_root"),
     )
 
 
