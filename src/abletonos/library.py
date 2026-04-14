@@ -2,6 +2,7 @@
 
 from __future__ import annotations
 
+import shutil
 from dataclasses import dataclass, field
 from pathlib import Path
 
@@ -125,3 +126,35 @@ def analyze_folder(source: Path) -> list[SampleEntry]:
         )
 
     return entries
+
+
+def import_samples(entries: list[SampleEntry], library_root: Path) -> ImportResult:
+    """Copy sample entries into the library.
+
+    Uses shutil.copy2 to preserve mtime. Skips files that already exist
+    at the destination. Continues on permission errors, recording them.
+
+    Args:
+        entries: List of SampleEntry objects (from analyze_folder or preview).
+        library_root: Root of the organized sample library.
+
+    Returns:
+        ImportResult with counts of copied, skipped, and errored files.
+    """
+    result = ImportResult()
+
+    for entry in entries:
+        dest = library_root / entry.destination_path
+
+        if dest.exists():
+            result.skipped += 1
+            continue
+
+        try:
+            dest.parent.mkdir(parents=True, exist_ok=True)
+            shutil.copy2(entry.source_path, dest)
+            result.copied += 1
+        except Exception as exc:
+            result.errors.append((entry.source_path, str(exc)))
+
+    return result
