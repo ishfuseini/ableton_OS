@@ -97,3 +97,31 @@ def classify_sample(file: Path, source_root: Path) -> str:
             return type_name
 
     return "Other"
+
+
+def analyze_folder(source: Path) -> list[SampleEntry]:
+    """Walk source folder and classify all audio files.
+
+    Returns a list of SampleEntry objects with proposed destinations.
+    Returns empty list if no audio files are found.
+    """
+    pack_name = source.name
+    entries: list[SampleEntry] = []
+
+    for file in sorted(source.rglob("*")):
+        if not file.is_file():
+            continue
+        if file.suffix.lower() not in AUDIO_EXTENSIONS:
+            continue
+
+        proposed_type = classify_sample(file, source)
+        entries.append(
+            SampleEntry(
+                source_path=file,
+                pack_name=pack_name,
+                proposed_type=proposed_type,
+                destination_path=Path(proposed_type) / pack_name / file.name,
+            )
+        )
+
+    return entries
