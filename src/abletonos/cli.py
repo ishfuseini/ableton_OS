@@ -3,6 +3,7 @@
 from __future__ import annotations
 
 import os
+import shutil
 from pathlib import Path
 
 import typer
@@ -168,8 +169,6 @@ def add_samples(
     Classifies samples by folder structure and filename keywords into:
     Drums, Bass, Synth, FX, Vocals, Guitar, or Other.
     """
-    import shutil as _shutil
-
     from abletonos.library import analyze_folder, import_samples, preview
 
     # Load and validate config
@@ -208,7 +207,7 @@ def add_samples(
     # Disk space check
     total_size = sum(e.source_path.stat().st_size for e in entries)
     library_root.mkdir(parents=True, exist_ok=True)
-    free_space = _shutil.disk_usage(library_root).free
+    free_space = shutil.disk_usage(library_root).free
     if total_size > free_space:
         total_mb = total_size / 1024 / 1024
         free_mb = free_space / 1024 / 1024

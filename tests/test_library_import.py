@@ -1,6 +1,7 @@
 """Tests for import_samples."""
 
 from pathlib import Path
+from unittest.mock import patch
 
 from abletonos.library import SampleEntry, import_samples
 
@@ -73,3 +74,23 @@ def test_import_creates_directories(tmp_path):
     import_samples([entry], library)
 
     assert (library / "Vocals" / "New-Pack").is_dir()
+
+
+def test_import_records_error_on_permission_failure(tmp_path):
+    """Permission errors are recorded in result.errors, processing continues."""
+    src1 = _make_audio_file(tmp_path / "source" / "kick.wav")
+    src2 = _make_audio_file(tmp_path / "source" / "snare.wav")
+    library = tmp_path / "library"
+
+    entry1 = _make_entry(src1, "My-Pack", "Drums")
+    entry2 = _make_entry(src2, "My-Pack", "Drums")
+
+    # Simulate copy2 raising PermissionError for both entries
+    with patch("abletonos.library.shutil.copy2", side_effect=PermissionError("denied")):
+        result = import_samples([entry1, entry2], library)
+
+    # Both copy attempts failed
+    assert result.copied == 0
+    assert len(result.errors) == 2
+    # Processing continued past the first error (both entries attempted)
+    assert result.skipped == 0

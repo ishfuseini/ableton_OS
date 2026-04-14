@@ -3,6 +3,7 @@
 from __future__ import annotations
 
 import shutil
+from collections import Counter
 from dataclasses import dataclass, field
 from pathlib import Path
 
@@ -179,8 +180,6 @@ def preview(
     Returns:
         The (possibly modified) list of SampleEntry objects.
     """
-    from collections import Counter
-
     from rich.console import Console as RichConsole
     from rich.prompt import Confirm, Prompt
     from rich.table import Table
